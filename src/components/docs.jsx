@@ -4,23 +4,24 @@ import { addDoc, collection, onSnapshot } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSelector } from 'react-redux';
 
-const useDocsData = (database) => {
-    const [docsData, setDocsData] = useState([]);
-    useEffect(() => {
-        const collectionRef = collection(database, 'docsData');
-        const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-            setDocsData(data);
-        });
-        return () => {
-            unsubscribe();
-        };
-    }, [database]);
-
-    return docsData;
-};
-export default function Docs({ database }) {
+const Docs = () => {
+    const database = useSelector(state => state.database.value)
+    const useDocsData = (database) => {
+        const [docsData, setDocsData] = useState([]);
+        useEffect(() => {
+            const collectionRef = collection(database, 'docsData');
+            const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+                const data = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+                setDocsData(data);
+            });
+            return () => {
+                unsubscribe();
+            };
+        }, [database]);
+        return docsData;
+    };
     const navigate = useNavigate();
     const isMounted = useRef(false);
     const [open, setOpen] = useState(false);
@@ -68,3 +69,5 @@ export default function Docs({ database }) {
         </div>
     );
 }
+
+export default Docs

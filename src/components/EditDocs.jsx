@@ -5,17 +5,19 @@ import 'react-quill/dist/quill.snow.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateDoc, collection, doc, onSnapshot } from 'firebase/firestore';
+import { useSelector } from 'react-redux';
 
-export default function EditDocs({ database }) {
+export default function EditDocs() {
+    const database = useSelector(state => state.database.value)
     const [documentTitle, setDocumentTitle] = useState('');
     const [docsDesc, setDocsDesc] = useState('');
     const params = useParams();
     const collectionRef = collection(database, 'docsData');
     const isMounted = useRef(false);
-
     const getQuillData = (value) => {
         setDocsDesc(value);
     };
+
 
     useEffect(() => {
         // Обновление данных через определенное время после того, как пользователь остановил печатать
@@ -25,12 +27,12 @@ export default function EditDocs({ database }) {
                 docsDesc: docsDesc,
             })
                 .then(() => {
-                    alert('Document Saved')
+                    toast.success('Document Saved')
                 })
                 .catch(() => {
-                    alert('Cannot Save Document')
+                    toast.success('Cannot Save Document')
                 });
-        }, 1500);
+        }, 2000);
 
         return () => clearTimeout(updateDocsData);
     }, [docsDesc, collectionRef, params.id]);
@@ -46,8 +48,6 @@ export default function EditDocs({ database }) {
             isMounted.current = true;
         }
     }, [collectionRef, params.id]);
-    console.log(toast)
-
 
     const handleSaveToFile = () => {
         const contentWithoutTags = docsDesc.replace(/<[^>]*>/g, '');
@@ -70,7 +70,7 @@ export default function EditDocs({ database }) {
             reader.readAsText(file);
         }
     };
-
+    console.log(docsDesc)
 
     return (
         <div className='editDocs-main'>
@@ -87,7 +87,7 @@ export default function EditDocs({ database }) {
                     onChange={getQuillData}
                 />
             </div>
-            
+
         </div>
     );
 }
